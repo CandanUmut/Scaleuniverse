@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Zoomable Universe — From Cells to Galaxies</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta
+    name="description"
+    content="A playful static visualization of scale in the universe, from living cells to human cities, planets, galaxies and beyond."
+  />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #020617;
+      --bg-soft: #02081b;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --accent-3: #f97316;
+      --text-main: #e5e7eb;
+      --text-soft: #9ca3af;
+      --border: #1f2937;
+      --radius-lg: 18px;
+      --shadow-soft: 0 20px 50px rgba(0, 0, 0, 0.75);
+      --transition-fast: 0.16s ease-out;
+      --transition-med: 0.26s ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        sans-serif;
+      background: radial-gradient(circle at top, #111827 0, #020617 40%, #000 100%);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      opacity: 0;
+      transition: opacity 0.4s ease-in-out;
+    }
+
+    body.loaded {
+      opacity: 1;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 16px 14px 24px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    header.hero {
+      position: relative;
+      overflow: hidden;
+      border-radius: 26px;
+      padding: 16px 18px 18px;
+      background:
+        radial-gradient(circle at top left, #0f172a 0, #020617 50%, #020617 100%);
+      border: 1px solid rgba(148, 163, 184, 0.45);
+      box-shadow: var(--shadow-soft);
+    }
+
+    @media (min-width: 768px) {
+      header.hero {
+        padding: 20px 22px 22px;
+      }
+    }
+
+    .hero-inner {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    @media (min-width: 840px) {
+      .hero-inner {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+      }
+    }
+
+    .hero-main {
+      max-width: 660px;
+      position: relative;
+      z-index: 2;
+    }
+
+    .hero-kicker {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: #bae6fd;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+    }
+
+    .hero-kicker-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--accent-2);
+      box-shadow: 0 0 0 7px rgba(34, 197, 94, 0.45);
+    }
+
+    .hero-title {
+      margin: 10px 0 6px 0;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      line-height: 1.1;
+      font-weight: 700;
+      color: #f9fafb;
+    }
+
+    .hero-subtitle {
+      margin: 0;
+      font-size: 0.95rem;
+      line-height: 1.6;
+      color: rgba(226, 232, 240, 0.95);
+    }
+
+    .hero-meta {
+      margin-top: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      font-size: 0.78rem;
+      color: #e5e7eb;
+    }
+
+    .hero-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+
+    .hero-meta-icon {
+      font-size: 0.9rem;
+    }
+
+    .hero-cta {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn {
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.9rem;
+      border-radius: 999px;
+      padding: 9px 16px;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      white-space: nowrap;
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+        background var(--transition-fast), color var(--transition-fast),
+        border-color var(--transition-fast);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #022c22;
+      font-weight: 600;
+      box-shadow: 0 15px 30px rgba(34, 197, 94, 0.6);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 18px 36px rgba(34, 197, 94, 0.75);
+    }
+
+    .btn-ghost {
+      background: rgba(15, 23, 42, 0.9);
+      color: #e5e7eb;
+      border: 1px solid rgba(148, 163, 184, 0.7);
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 1);
+      transform: translateY(-1px);
+    }
+
+    .hero-orb {
+      position: absolute;
+      right: -60px;
+      top: -60px;
+      width: 220px;
+      height: 220px;
+      background:
+        radial-gradient(circle at 30% 20%, #f9fafb 0, var(--accent) 30%, #0f172a 65%, transparent 72%);
+      opacity: 0.5;
+      filter: blur(1px);
+      pointer-events: none;
+      animation: orbit 18s linear infinite;
+    }
+
+    @media (max-width: 839px) {
+      .hero-orb {
+        width: 160px;
+        height: 160px;
+        right: -40px;
+        top: -40px;
+      }
+    }
+
+    @keyframes orbit {
+      0% { transform: translate(0,0) rotate(0deg); }
+      50% { transform: translate(-12px,10px) rotate(160deg); }
+      100% { transform: translate(0,0) rotate(360deg); }
+    }
+
+    .hero-aside {
+      position: relative;
+      z-index: 2;
+      margin-top: 4px;
+    }
+
+    @media (min-width: 840px) {
+      .hero-aside {
+        max-width: 260px;
+        margin-top: 0;
+      }
+    }
+
+    .aside-card {
+      background: rgba(15, 23, 42, 0.96);
+      border-radius: 18px;
+      padding: 10px 11px 11px;
+      border: 1px solid rgba(148, 163, 184, 0.9);
+      box-shadow: 0 14px 28px rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(13px);
+      font-size: 0.78rem;
+      color: #e5e7eb;
+    }
+
+    .aside-card h3 {
+      margin: 0 0 4px 0;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #bfdbfe;
+    }
+
+    .aside-card p {
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    .legend-row {
+      margin-top: 8px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .legend-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 3px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      font-size: 0.74rem;
+      color: #9ca3af;
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+    }
+
+    .legend-dot.micro { background: #a855f7; }
+    .legend-dot.human { background: #fbbf24; }
+    .legend-dot.earth { background: #38bdf8; }
+    .legend-dot.galaxy { background: #f97316; }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 12px;
+      margin-top: 6px;
+    }
+
+    @media (max-width: 900px) {
+      .layout {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .card {
+      background: radial-gradient(circle at top left, #111827 0, #020617 55%);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 14px 14px 13px;
+      box-shadow: 0 20px 50px rgba(15, 23, 42, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 16px 16px 15px;
+      }
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top left, rgba(148, 163, 184, 0.26), transparent 60%);
+      opacity: 0;
+      transition: opacity var(--transition-med);
+      pointer-events: none;
+    }
+
+    .card:hover::before {
+      opacity: 0.5;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 0.98rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: #e5e7eb;
+    }
+
+    .card-badge {
+      font-size: 0.74rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.7);
+      color: #cbd5f5;
+    }
+
+    .card-body {
+      font-size: 0.86rem;
+      color: var(--text-soft);
+    }
+
+    .card-body p {
+      margin: 3px 0 6px 0;
+    }
+
+    .scale-note {
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      margin-top: 6px;
+    }
+
+    .scale-note strong {
+      color: #e5e7eb;
+    }
+
+    .cosmos-wrapper {
+      margin-top: 6px;
+      border-radius: 18px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: radial-gradient(circle at top, #020617 0, #000 60%);
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 16 / 9;
+      min-height: 260px;
+    }
+
+    .cosmos-inner {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      cursor: grab;
+    }
+
+    .cosmos-inner:active {
+      cursor: grabbing;
+    }
+
+    .cosmos-layer {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.5);
+      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    }
+
+    /* Micro layer */
+    .micro-scene {
+      position: relative;
+      width: 260px;
+      height: 260px;
+    }
+
+    @media (min-width: 768px) {
+      .micro-scene {
+        width: 310px;
+        height: 310px;
+      }
+    }
+
+    .cell {
+      position: absolute;
+      inset: 18%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #f9a8d4 0, #a855f7 35%, #1e293b 70%);
+      box-shadow: 0 0 40px rgba(168, 85, 247, 0.8);
+      border: 2px solid rgba(248, 250, 252, 0.35);
+      animation: cell-pulse 5s ease-in-out infinite;
+    }
+
+    @keyframes cell-pulse {
+      0%, 100% { transform: scale(1); box-shadow: 0 0 40px rgba(168, 85, 247, 0.7);}
+      50% { transform: scale(1.06); box-shadow: 0 0 70px rgba(248, 113, 113, 0.9);}
+    }
+
+    .nucleus {
+      position: absolute;
+      inset: 30%;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #f9fafb 0, #f97316 50%, #0f172a 100%);
+      box-shadow: 0 0 25px rgba(248, 250, 252, 0.8);
+    }
+
+    .dna-helix {
+      position: absolute;
+      left: 10%;
+      right: 10%;
+      top: 5%;
+      bottom: 5%;
+      display: flex;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .dna-strand {
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(to bottom, #f97316, #a855f7);
+      opacity: 0.9;
+    }
+
+    .dna-rungs {
+      position: absolute;
+      inset: 10% 6%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .dna-rung {
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #38bdf8, #22c55e);
+      opacity: 0.8;
+    }
+
+    .micro-particles {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .micro-dot {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: rgba(248, 250, 252, 0.7);
+      opacity: 0.5;
+      animation: micro-drift 8s linear infinite;
+    }
+
+    @keyframes micro-drift {
+      0% { transform: translate3d(-10px, 0, 0); opacity: 0.2; }
+      50% { opacity: 0.8; }
+      100% { transform: translate3d(10px, 10px, 0); opacity: 0.1; }
+    }
+
+    /* Human / City layer */
+    .human-scene {
+      position: relative;
+      width: 340px;
+      height: 260px;
+    }
+
+    @media (min-width: 768px) {
+      .human-scene {
+        width: 390px;
+        height: 280px;
+      }
+    }
+
+    .ground {
+      position: absolute;
+      left: -10%;
+      right: -10%;
+      bottom: 20%;
+      height: 4px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #0f172a, #22c55e, #0f172a);
+      box-shadow: 0 0 20px rgba(34, 197, 94, 0.8);
+    }
+
+    .human-figure {
+      position: absolute;
+      bottom: 22%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40px;
+      height: 90px;
+      opacity: 0.96;
+    }
+
+    .human-head {
+      width: 22px;
+      height: 22px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 20%, #fef9c3 0, #f59e0b 60%, #78350f 100%);
+      margin: 0 auto;
+      box-shadow: 0 0 15px rgba(234, 179, 8, 0.9);
+    }
+
+    .human-body {
+      width: 20px;
+      height: 40px;
+      border-radius: 12px;
+      margin: 3px auto 0 auto;
+      background: linear-gradient(180deg, #22c55e, #15803d);
+    }
+
+    .human-leg {
+      position: absolute;
+      bottom: 0;
+      width: 7px;
+      height: 36px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #0f172a, #111827);
+      transform-origin: top center;
+      animation: walk 1s ease-in-out infinite alternate;
+    }
+
+    .human-leg.right {
+      right: 13px;
+      animation-delay: 0.3s;
+    }
+
+    .human-leg.left {
+      left: 13px;
+    }
+
+    @keyframes walk {
+      0% { transform: rotate(6deg); }
+      100% { transform: rotate(-6deg); }
+    }
+
+    .cityline {
+      position: absolute;
+      bottom: 24%;
+      left: 8%;
+      right: 8%;
+      height: 70px;
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+    }
+
+    .building {
+      flex: 1;
+      border-radius: 4px 4px 0 0;
+      background: linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.2));
+      border: 1px solid rgba(30, 64, 175, 0.8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .building:nth-child(2) { height: 42px; }
+    .building:nth-child(3) { height: 58px; }
+    .building:nth-child(4) { height: 32px; }
+    .building:nth-child(1) { height: 50px; }
+    .building:nth-child(5) { height: 46px; }
+
+    .window-row {
+      position: absolute;
+      left: 3px;
+      right: 3px;
+      top: 4px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 3px;
+    }
+
+    .window {
+      width: 5px;
+      height: 5px;
+      border-radius: 2px;
+      background: rgba(250, 250, 210, 0.85);
+      opacity: 0.3;
+      animation: window-flicker 4s linear infinite;
+    }
+
+    @keyframes window-flicker {
+      0%, 100% { opacity: 0.2; }
+      45% { opacity: 0.7; }
+      70% { opacity: 0.3; }
+    }
+
+    .city-stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .city-star {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(248, 250, 252, 0.8);
+      opacity: 0.5;
+      animation: twinkle 3.8s ease-in-out infinite;
+    }
+
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.2; transform: scale(1); }
+      50% { opacity: 0.9; transform: scale(1.4); }
+    }
+
+    .you-label {
+      position: absolute;
+      top: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: #e5e7eb;
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: 999px;
+      padding: 3px 8px;
+      border: 1px solid rgba(148, 163, 184, 0.8);
+      box-shadow: 0 10px 20px rgba(15, 23, 42, 0.9);
+    }
+
+    /* Solar System layer */
+    .solar-scene {
+      position: relative;
+      width: 360px;
+      height: 360px;
+    }
+
+    @media (min-width: 768px) {
+      .solar-scene {
+        width: 420px;
+        height: 420px;
+      }
+    }
+
+    .sun {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 80px;
+      height: 80px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 20%, #fef9c3 0, #f97316 40%, #b91c1c 80%);
+      box-shadow: 0 0 70px rgba(252, 211, 77, 0.9);
+    }
+
+    .orbit-ring {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 50%;
+      border: 1px dashed rgba(148, 163, 184, 0.5);
+      transform: translate(-50%, -50%);
+    }
+
+    .orbit {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform-origin: center;
+      animation: orbit-rotate linear infinite;
+    }
+
+    @keyframes orbit-rotate {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .planet {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      border-radius: 50%;
+      transform: translateX(0) translate(-50%, -50%);
+    }
+
+    .planet.mercury {
+      width: 8px;
+      height: 8px;
+      background: #9ca3af;
+      box-shadow: 0 0 10px rgba(148, 163, 184, 0.8);
+    }
+
+    .planet.earth {
+      width: 16px;
+      height: 16px;
+      background: radial-gradient(circle at 30% 20%, #f9fafb 0, #22c55e 40%, #0284c7 80%);
+      box-shadow: 0 0 18px rgba(56, 189, 248, 0.9);
+    }
+
+    .planet.mars {
+      width: 12px;
+      height: 12px;
+      background: radial-gradient(circle at 30% 20%, #fed7aa 0, #f97316 60%, #7c2d12 90%);
+    }
+
+    .planet.jupiter {
+      width: 26px;
+      height: 26px;
+      background: radial-gradient(circle at 30% 20%, #fee2e2 0, #f97316 40%, #78350f 90%);
+    }
+
+    .planet.saturn {
+      width: 24px;
+      height: 24px;
+      background: radial-gradient(circle at 30% 20%, #fef3c7 0, #eab308 45%, #78350f 90%);
+    }
+
+    .ring {
+      position: absolute;
+      inset: 3px;
+      border-radius: 50%;
+      border: 2px solid rgba(250, 250, 249, 0.6);
+      transform: rotate(25deg);
+      opacity: 0.8;
+    }
+
+    .solar-stars {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .solar-star {
+      position: absolute;
+      width: 3px;
+      height: 3px;
+      border-radius: 999px;
+      background: rgba(248, 250, 252, 0.7);
+      opacity: 0.3;
+      animation: twinkle 4.2s ease-in-out infinite;
+    }
+
+    /* Galaxy layer */
+    .galaxy-scene {
+      position: relative;
+      width: 460px;
+      height: 460px;
+    }
+
+    @media (min-width: 768px) {
+      .galaxy-scene {
+        width: 520px;
+        height: 520px;
+      }
+    }
+
+    .galaxy-core {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 140px;
+      height: 140px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: radial-gradient(circle, #fef9c3 0, #f97316 25%, #581c87 70%, transparent 80%);
+      box-shadow: 0 0 110px rgba(251, 191, 36, 0.8);
+      opacity: 0.9;
+    }
+
+    .galaxy-arm {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 440px;
+      height: 440px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 10% 50%, rgba(248, 250, 252, 0.7) 0, transparent 55%),
+        radial-gradient(circle at 90% 50%, rgba(248, 250, 252, 0.6) 0, transparent 55%);
+      opacity: 0.5;
+      filter: blur(2px);
+      animation: galaxy-spin 90s linear infinite;
+    }
+
+    .galaxy-arm.alt {
+      width: 360px;
+      height: 360px;
+      opacity: 0.4;
+      animation-duration: 65s;
+      animation-direction: reverse;
+    }
+
+    @keyframes galaxy-spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+
+    .galaxy-stars {
+      position: absolute;
+      inset: -20%;
+      background-image:
+        radial-gradient(circle at 10% 20%, rgba(248, 250, 252, 0.6) 0, transparent 55%),
+        radial-gradient(circle at 70% 80%, rgba(248, 250, 252, 0.5) 0, transparent 60%),
+        radial-gradient(circle at 40% 50%, rgba(248, 250, 252, 0.4) 0, transparent 50%);
+      opacity: 0.4;
+      filter: blur(1px);
+      animation: galaxy-drift 40s linear infinite;
+    }
+
+    @keyframes galaxy-drift {
+      0% { transform: translate3d(0,0,0); }
+      50% { transform: translate3d(12px, 3px, 0); }
+      100% { transform: translate3d(0,0,0); }
+    }
+
+    .universe-stars {
+      position: absolute;
+      inset: 0;
+      background-image:
+        radial-gradient(circle at 5% 5%, rgba(248, 250, 252, 0.9) 0, transparent 60%),
+        radial-gradient(circle at 85% 15%, rgba(248, 250, 252, 0.6) 0, transparent 60%),
+        radial-gradient(circle at 20% 85%, rgba(248, 250, 252, 0.6) 0, transparent 60%),
+        radial-gradient(circle at 70% 75%, rgba(248, 250, 252, 0.4) 0, transparent 60%);
+      opacity: 0.15;
+      animation: universe-parallax 50s linear infinite alternate;
+    }
+
+    @keyframes universe-parallax {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.06); }
+    }
+
+    /* Controls & info */
+    .controls-card {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .slider-row {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .slider-label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .slider-label-row span {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    .slider-label-row strong {
+      color: #e5e7eb;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      outline: none;
+      margin: 0;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #f9fafb;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
+      cursor: pointer;
+      margin-top: -5px;
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #f9fafb;
+      border: 2px solid var(--accent);
+      box-shadow: 0 0 10px rgba(56, 189, 248, 0.9);
+      cursor: pointer;
+    }
+
+    .scale-markers {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 2px;
+      font-size: 0.72rem;
+      color: var(--text-soft);
+    }
+
+    .scale-markers span {
+      transform: translateX(-50%);
+    }
+
+    .scale-info-card {
+      border-radius: 14px;
+      border: 1px solid rgba(31, 41, 55, 0.9);
+      background: rgba(15, 23, 42, 0.96);
+      padding: 8px 10px 9px;
+      font-size: 0.8rem;
+    }
+
+    .scale-info-title {
+      font-size: 0.86rem;
+      font-weight: 600;
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .scale-info-title span.dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(56, 189, 248, 0.9);
+    }
+
+    .scale-info-meta {
+      margin-top: 3px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .scale-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      border: 1px solid rgba(55, 65, 81, 0.9);
+      background: rgba(15, 23, 42, 0.9);
+      font-size: 0.72rem;
+      color: var(--text-soft);
+    }
+
+    .scale-chip small {
+      opacity: 0.9;
+    }
+
+    .scale-info-text {
+      margin-top: 4px;
+      line-height: 1.5;
+      color: var(--text-soft);
+    }
+
+    .hint-row {
+      margin-top: 4px;
+      font-size: 0.78rem;
+      color: var(--text-soft);
+    }
+
+    .hint-row strong {
+      color: #e5e7eb;
+    }
+
+    footer {
+      margin-top: 4px;
+      font-size: 0.76rem;
+      text-align: center;
+      color: var(--text-soft);
+      opacity: 0.95;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="hero">
+      <div class="hero-orb"></div>
+      <div class="hero-inner">
+        <div class="hero-main">
+          <div class="hero-kicker">
+            <span class="hero-kicker-dot"></span>
+            <span>Scale explorer · Ölçek yolculuğu</span>
+          </div>
+          <h1 class="hero-title">
+            Zoomable Universe
+          </h1>
+          <p class="hero-subtitle">
+            From living cells to cities, planets, galaxies and beyond. Scroll or drag the slider
+            to travel through scales and feel how incredibly small (and yet meaningful) our place
+            in this vast universe really is.
+          </p>
+          <div class="hero-meta">
+            <span><span class="hero-meta-icon">🧬</span><span>Cells · tissue · human scale</span></span>
+            <span><span class="hero-meta-icon">🪐</span><span>Earth · planets · star orbits</span></span>
+            <span><span class="hero-meta-icon">🌌</span><span>Galaxy clusters · cosmic web</span></span>
+          </div>
+          <div class="hero-cta">
+            <button class="btn btn-primary" id="jump-human">
+              Take me to human scale
+            </button>
+            <button class="btn btn-ghost" id="jump-cosmos">
+              Jump to galaxies
+            </button>
+          </div>
+        </div>
+        <div class="hero-aside">
+          <div class="aside-card">
+            <h3>What am I looking at?</h3>
+            <p>
+              This is a <strong>visual toy</strong>, not a physics engine. Distances, sizes and
+              orbits are stylized — the goal is to build an intuition: from the scale of a single
+              <em>cell</em> all the way to swirling <em>galaxies</em>, our world sits on a tiny ledge
+              in a gigantic canvas.
+            </p>
+            <div class="legend-row">
+              <span class="legend-pill">
+                <span class="legend-dot micro"></span><span>Micro</span>
+              </span>
+              <span class="legend-pill">
+                <span class="legend-dot human"></span><span>Human</span>
+              </span>
+              <span class="legend-pill">
+                <span class="legend-dot earth"></span><span>Planets</span>
+              </span>
+              <span class="legend-pill">
+                <span class="legend-dot galaxy"></span><span>Galaxy</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="layout">
+        <section class="card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span>Interactive scale window</span>
+              <span class="card-badge">Scroll / drag to zoom</span>
+            </h2>
+          </div>
+          <div class="card-body">
+            <p>
+              Use your mouse wheel, trackpad or the slider on the right to zoom smoothly between
+              four main regions: microscopic life, human scale, planetary orbits and galactic
+              structure.
+            </p>
+            <p class="scale-note">
+              <strong>Note:</strong> nothing here is perfectly to scale. It’s an
+              <em>imagination aid</em>, designed to be visually pleasant and emotionally honest.
+            </p>
+            <div class="cosmos-wrapper" id="cosmos-wrapper">
+              <div class="cosmos-inner" id="cosmos-inner">
+                <!-- MICRO LAYER -->
+                <div class="cosmos-layer" data-layer="micro">
+                  <div class="micro-scene">
+                    <div class="micro-particles" id="micro-particles"></div>
+                    <div class="cell"></div>
+                    <div class="nucleus"></div>
+                    <div class="dna-helix">
+                      <div class="dna-strand"></div>
+                      <div class="dna-strand"></div>
+                    </div>
+                    <div class="dna-rungs">
+                      <!-- created in JS or static: we can make a few -->
+                      <div class="dna-rung"></div>
+                      <div class="dna-rung"></div>
+                      <div class="dna-rung"></div>
+                      <div class="dna-rung"></div>
+                      <div class="dna-rung"></div>
+                      <div class="dna-rung"></div>
+                      <div class="dna-rung"></div>
+                      <div class="dna-rung"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- HUMAN / CITY LAYER -->
+                <div class="cosmos-layer" data-layer="human">
+                  <div class="human-scene">
+                    <div class="city-stars" id="city-stars"></div>
+                    <div class="you-label">You are here · Buradasın</div>
+                    <div class="ground"></div>
+                    <div class="human-figure">
+                      <div class="human-head"></div>
+                      <div class="human-body"></div>
+                      <div class="human-leg left"></div>
+                      <div class="human-leg right"></div>
+                    </div>
+                    <div class="cityline">
+                      <div class="building">
+                        <div class="window-row">
+                          <div class="window"></div><div class="window"></div><div class="window"></div>
+                          <div class="window"></div><div class="window"></div>
+                        </div>
+                      </div>
+                      <div class="building">
+                        <div class="window-row">
+                          <div class="window"></div><div class="window"></div>
+                          <div class="window"></div><div class="window"></div>
+                          <div class="window"></div>
+                        </div>
+                      </div>
+                      <div class="building">
+                        <div class="window-row">
+                          <div class="window"></div><div class="window"></div>
+                          <div class="window"></div><div class="window"></div>
+                          <div class="window"></div>
+                        </div>
+                      </div>
+                      <div class="building">
+                        <div class="window-row">
+                          <div class="window"></div><div class="window"></div>
+                          <div class="window"></div>
+                        </div>
+                      </div>
+                      <div class="building">
+                        <div class="window-row">
+                          <div class="window"></div><div class="window"></div>
+                          <div class="window"></div><div class="window"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- SOLAR SYSTEM LAYER -->
+                <div class="cosmos-layer" data-layer="solar">
+                  <div class="solar-scene">
+                    <div class="solar-stars" id="solar-stars"></div>
+                    <div class="sun"></div>
+
+                    <!-- Orbits + planets -->
+                    <!-- Mercury -->
+                    <div class="orbit-ring" style="width:130px;height:130px;"></div>
+                    <div class="orbit" style="animation-duration: 16s;">
+                      <div class="planet mercury" style="transform: translateX(65px) translate(-50%, -50%);"></div>
+                    </div>
+
+                    <!-- Earth -->
+                    <div class="orbit-ring" style="width:210px;height:210px;"></div>
+                    <div class="orbit" style="animation-duration: 26s;">
+                      <div class="planet earth" style="transform: translateX(105px) translate(-50%, -50%);"></div>
+                    </div>
+
+                    <!-- Mars -->
+                    <div class="orbit-ring" style="width:260px;height:260px;"></div>
+                    <div class="orbit" style="animation-duration: 33s;">
+                      <div class="planet mars" style="transform: translateX(130px) translate(-50%, -50%);"></div>
+                    </div>
+
+                    <!-- Jupiter -->
+                    <div class="orbit-ring" style="width:320px;height:320px;"></div>
+                    <div class="orbit" style="animation-duration: 45s;">
+                      <div class="planet jupiter" style="transform: translateX(160px) translate(-50%, -50%);"></div>
+                    </div>
+
+                    <!-- Saturn -->
+                    <div class="orbit-ring" style="width:380px;height:380px;"></div>
+                    <div class="orbit" style="animation-duration: 60s;">
+                      <div class="planet saturn" style="transform: translateX(190px) translate(-50%, -50%);">
+                        <div class="ring"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- GALAXY / UNIVERSE LAYER -->
+                <div class="cosmos-layer" data-layer="galaxy">
+                  <div class="galaxy-scene">
+                    <div class="universe-stars"></div>
+                    <div class="galaxy-stars"></div>
+                    <div class="galaxy-core"></div>
+                    <div class="galaxy-arm"></div>
+                    <div class="galaxy-arm alt"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card controls-card">
+          <div class="card-header">
+            <h2 class="card-title">
+              <span>Scale & details</span>
+              <span class="card-badge">From 10⁻⁶ m to 10²⁴ m</span>
+            </h2>
+          </div>
+          <div class="card-body">
+            <div class="slider-row">
+              <div class="slider-label-row">
+                <span><strong>Scale</strong> (approximate)</span>
+                <span id="scale-value-label">Micro · Cell scale</span>
+              </div>
+              <input type="range" id="scale-range" min="0" max="100" value="35" />
+              <div class="scale-markers">
+                <span>Cell</span>
+                <span>Human</span>
+                <span>Earth / Sun</span>
+                <span>Galaxy</span>
+              </div>
+            </div>
+
+            <div class="scale-info-card">
+              <div class="scale-info-title">
+                <span class="dot" id="scale-dot"></span>
+                <span id="scale-title">Human · City & life size</span>
+              </div>
+              <div class="scale-info-meta">
+                <div class="scale-chip">
+                  <small id="scale-meter">~ 1–10 m</small>
+                </div>
+                <div class="scale-chip">
+                  <span>Perspective:</span><small id="scale-perspective">You are walking on the surface of a huge sphere.</small>
+                </div>
+              </div>
+              <p class="scale-info-text" id="scale-description">
+                The scale of bodies, rooms, buildings and streets. At this level we tend to feel
+                like “normal size” — but compared to planets and galaxies, even a city is a dust
+                speck.
+              </p>
+            </div>
+
+            <div class="hint-row">
+              <strong>Controls:</strong> Scroll over the main window to zoom · Drag the slider · Try
+              jumping between human and galaxy scales. <br />
+              <span style="opacity:0.9;">(Bu sadece görsel ve eğitici bir araçtır, tam fiziksel ölçek doğru değildir.)</span>
+            </div>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <footer>
+      Built as a static HTML experiment to feel cosmic scale a bit more deeply.  
+      No tracking, no data collection — just you, a browser and a very big universe.
+    </footer>
+  </div>
+
+  <script>
+    // --- State & constants ---
+    const scaleRange = document.getElementById("scale-range");
+    const scaleValueLabel = document.getElementById("scale-value-label");
+    const scaleTitleEl = document.getElementById("scale-title");
+    const scaleMeterEl = document.getElementById("scale-meter");
+    const scalePerspectiveEl = document.getElementById("scale-perspective");
+    const scaleDescEl = document.getElementById("scale-description");
+    const scaleDotEl = document.getElementById("scale-dot");
+    const cosmosInner = document.getElementById("cosmos-inner");
+    const cosmosWrapper = document.getElementById("cosmos-wrapper");
+    const layers = Array.from(document.querySelectorAll(".cosmos-layer"));
+
+    // For extra dots/stars we fill dynamically
+    const microParticles = document.getElementById("micro-particles");
+    const cityStars = document.getElementById("city-stars");
+    const solarStars = document.getElementById("solar-stars");
+
+    const scaleConfig = [
+      {
+        key: "micro",
+        center: 10,
+        dotColor: "#a855f7",
+        label: "Micro · Cell scale",
+        meter: "~ 10⁻⁶ – 10⁻³ m",
+        perspective:
+          "Cell membranes, organelles and DNA spirals – a universe inside every living being.",
+        description:
+          "At this scale, life is made of tiny structures, constantly in motion. A single cell is a world of its own, full of instructions and activity that you never see with bare eyes.",
+      },
+      {
+        key: "human",
+        center: 35,
+        dotColor: "#fbbf24",
+        label: "Human · City & life size",
+        meter: "~ 1 – 10² m",
+        perspective:
+          "Rooms, people, houses and skyscrapers – the scale we emotionally call ‘normal’.",
+        description:
+          "Here we walk, work, love, get tired and dream. It feels like everything important happens at this size, yet even our largest cities are microscopic compared to planets.",
+      },
+      {
+        key: "solar",
+        center: 65,
+        dotColor: "#38bdf8",
+        label: "Planetary · Earth & Sun",
+        meter: "~ 10⁶ – 10¹² m",
+        perspective:
+          "Earth, Moon, planets and the star that keeps us warm – the Solar System neighbourhood.",
+        description:
+          "Now Earth becomes a small marble orbiting a star. Distances between planets are huge; months or years of travel. Our whole world is just one orbit in a quiet corner of a galaxy.",
+      },
+      {
+        key: "galaxy",
+        center: 90,
+        dotColor: "#f97316",
+        label: "Galactic & beyond",
+        meter: "~ 10¹⁸ – 10²⁴ m",
+        perspective:
+          "Billions of stars swirling together; clusters of galaxies linked in a cosmic web.",
+        description:
+          "Our Sun is one among hundreds of billions in the Milky Way. And the Milky Way is just one galaxy among perhaps trillions. On this canvas, our entire Solar System is almost invisible.",
+      },
+    ];
+
+    // --- Init random particles / stars for extra life ---
+    function createRandomDots(container, count, sizeMin, sizeMax, className) {
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const width = rect.width || container.clientWidth || 260;
+      const height = rect.height || container.clientHeight || 260;
+      for (let i = 0; i < count; i++) {
+        const dot = document.createElement("div");
+        dot.className = className;
+        const size = sizeMin + Math.random() * (sizeMax - sizeMin);
+        dot.style.width = `${size}px`;
+        dot.style.height = `${size}px`;
+        dot.style.left = `${Math.random() * width}px`;
+        dot.style.top = `${Math.random() * height}px`;
+        dot.style.animationDelay = `${Math.random() * 5}s`;
+        container.appendChild(dot);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      document.body.classList.add("loaded");
+
+      createRandomDots(microParticles, 30, 3, 5, "micro-dot");
+      createRandomDots(cityStars, 22, 2, 3, "city-star");
+      createRandomDots(solarStars, 26, 2, 3, "solar-star");
+
+      // initial scale
+      updateScale(Number(scaleRange.value));
+
+      scaleRange.addEventListener("input", (e) => {
+        const value = Number(e.target.value);
+        updateScale(value);
+      });
+
+      cosmosWrapper.addEventListener(
+        "wheel",
+        (e) => {
+          e.preventDefault();
+          const delta = e.deltaY;
+          const current = Number(scaleRange.value);
+          const step = delta > 0 ? 3 : -3;
+          const next = clamp(current + step, 0, 100);
+          scaleRange.value = String(next);
+          updateScale(next);
+        },
+        { passive: false }
+      );
+
+      document.getElementById("jump-human").addEventListener("click", () => {
+        animateSliderTo(35);
+      });
+      document.getElementById("jump-cosmos").addEventListener("click", () => {
+        animateSliderTo(90);
+      });
+    });
+
+    function clamp(num, min, max) {
+      return Math.min(Math.max(num, min), max);
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function updateScale(value) {
+      const v = clamp(value, 0, 100);
+
+      // update layers visibility & scale
+      layers.forEach((layer) => {
+        const key = layer.dataset.layer;
+        const cfg = scaleConfig.find((c) => c.key === key);
+        if (!cfg) return;
+        const dist = Math.abs(v - cfg.center);
+        const band = 28; // width of blending region
+        let visibility = 1 - dist / band;
+        visibility = clamp(visibility, 0, 1);
+
+        const scaleFactor = lerp(0.7, 1.05, visibility);
+        layer.style.opacity = (visibility ** 1.3).toFixed(3);
+        layer.style.transform = `scale(${scaleFactor})`;
+      });
+
+      // pick nearest scale config for text
+      let best = scaleConfig[0];
+      let bestDist = 999;
+      for (const cfg of scaleConfig) {
+        const d = Math.abs(v - cfg.center);
+        if (d < bestDist) {
+          bestDist = d;
+          best = cfg;
+        }
+      }
+
+      scaleValueLabel.textContent = best.label;
+      scaleTitleEl.textContent = best.label;
+      scaleMeterEl.textContent = best.meter;
+      scalePerspectiveEl.textContent = best.perspective;
+      scaleDescEl.textContent = best.description;
+      scaleDotEl.style.background = best.dotColor;
+      scaleDotEl.style.boxShadow = `0 0 12px ${best.dotColor}`;
+    }
+
+    function animateSliderTo(target) {
+      const start = Number(scaleRange.value);
+      const duration = 450;
+      const startTime = performance.now();
+
+      function frame(now) {
+        const t = clamp((now - startTime) / duration, 0, 1);
+        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const value = lerp(start, target, eased);
+        scaleRange.value = String(value.toFixed(0));
+        updateScale(value);
+        if (t < 1) requestAnimationFrame(frame);
+      }
+
+      requestAnimationFrame(frame);
+    }
+  </script>
+</body>
+</html>
