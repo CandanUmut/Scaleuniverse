@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta
     name="description"
-    content="A playful static visualization of scale in the universe, from living cells to human cities, planets, galaxies and beyond."
+    content="A continuous zoom visualization of scale in the universe, from cells to humans, planets, and galaxies."
   />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <style>
@@ -60,8 +60,7 @@
       overflow: hidden;
       border-radius: 26px;
       padding: 16px 18px 18px;
-      background:
-        radial-gradient(circle at top left, #0f172a 0, #020617 50%, #020617 100%);
+      background: radial-gradient(circle at top left, #0f172a 0, #020617 50%, #020617 100%);
       border: 1px solid rgba(148, 163, 184, 0.45);
       box-shadow: var(--shadow-soft);
     }
@@ -389,6 +388,7 @@
       color: #e5e7eb;
     }
 
+    /* --- COSMOS WINDOW --- */
     .cosmos-wrapper {
       margin-top: 6px;
       border-radius: 18px;
@@ -398,20 +398,28 @@
       overflow: hidden;
       aspect-ratio: 16 / 9;
       min-height: 260px;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .cosmos-wrapper.dragging {
+      cursor: grabbing;
     }
 
     .cosmos-inner {
       position: absolute;
       inset: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: hidden;
-      cursor: grab;
     }
 
-    .cosmos-inner:active {
-      cursor: grabbing;
+    .cosmos-world {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 800px;
+      height: 800px;
+      transform: translate(-50%, -50%) scale(1);
+      transform-origin: 50% 50%;
     }
 
     .cosmos-layer {
@@ -421,23 +429,17 @@
       align-items: center;
       justify-content: center;
       pointer-events: none;
-      opacity: 0;
-      transform: scale(0.5);
-      transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+      transition: opacity 0.35s ease-out;
     }
 
-    /* Micro layer */
+    /* MICRO */
     .micro-scene {
-      position: relative;
-      width: 260px;
-      height: 260px;
-    }
-
-    @media (min-width: 768px) {
-      .micro-scene {
-        width: 310px;
-        height: 310px;
-      }
+      position: absolute;
+      width: 230px;
+      height: 230px;
+      left: 50%;
+      top: 55%;
+      transform: translate(-50%, -50%);
     }
 
     .cell {
@@ -518,18 +520,28 @@
       100% { transform: translate3d(10px, 10px, 0); opacity: 0.1; }
     }
 
-    /* Human / City layer */
-    .human-scene {
-      position: relative;
-      width: 340px;
-      height: 260px;
+    .micro-label {
+      position: absolute;
+      left: 50%;
+      top: 77%;
+      transform: translateX(-50%);
+      font-size: 0.7rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.85);
+      border: 1px solid rgba(148,163,184,0.8);
+      color: #e5e7eb;
+      box-shadow: 0 10px 20px rgba(15,23,42,0.9);
     }
 
-    @media (min-width: 768px) {
-      .human-scene {
-        width: 390px;
-        height: 280px;
-      }
+    /* HUMAN / CITY */
+    .human-scene {
+      position: absolute;
+      width: 360px;
+      height: 260px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
     }
 
     .ground {
@@ -681,18 +693,14 @@
       box-shadow: 0 10px 20px rgba(15, 23, 42, 0.9);
     }
 
-    /* Solar System layer */
+    /* SOLAR SYSTEM */
     .solar-scene {
-      position: relative;
-      width: 360px;
-      height: 360px;
-    }
-
-    @media (min-width: 768px) {
-      .solar-scene {
-        width: 420px;
-        height: 420px;
-      }
+      position: absolute;
+      width: 520px;
+      height: 520px;
+      left: 50%;
+      top: 40%;
+      transform: translate(-50%, -50%);
     }
 
     .sun {
@@ -734,7 +742,7 @@
       left: 50%;
       top: 50%;
       border-radius: 50%;
-      transform: translateX(0) translate(-50%, -50%);
+      transform: translate(-50%, -50%);
     }
 
     .planet.mercury {
@@ -794,18 +802,14 @@
       animation: twinkle 4.2s ease-in-out infinite;
     }
 
-    /* Galaxy layer */
+    /* GALAXY */
     .galaxy-scene {
-      position: relative;
-      width: 460px;
-      height: 460px;
-    }
-
-    @media (min-width: 768px) {
-      .galaxy-scene {
-        width: 520px;
-        height: 520px;
-      }
+      position: absolute;
+      width: 900px;
+      height: 900px;
+      left: 50%;
+      top: 35%;
+      transform: translate(-50%, -50%);
     }
 
     .galaxy-core {
@@ -825,8 +829,8 @@
       position: absolute;
       left: 50%;
       top: 50%;
-      width: 440px;
-      height: 440px;
+      width: 840px;
+      height: 840px;
       transform: translate(-50%, -50%);
       border-radius: 50%;
       background:
@@ -838,8 +842,8 @@
     }
 
     .galaxy-arm.alt {
-      width: 360px;
-      height: 360px;
+      width: 680px;
+      height: 680px;
       opacity: 0.4;
       animation-duration: 65s;
       animation-direction: reverse;
@@ -876,7 +880,7 @@
         radial-gradient(circle at 85% 15%, rgba(248, 250, 252, 0.6) 0, transparent 60%),
         radial-gradient(circle at 20% 85%, rgba(248, 250, 252, 0.6) 0, transparent 60%),
         radial-gradient(circle at 70% 75%, rgba(248, 250, 252, 0.4) 0, transparent 60%);
-      opacity: 0.15;
+      opacity: 0.1;
       animation: universe-parallax 50s linear infinite alternate;
     }
 
@@ -885,7 +889,20 @@
       100% { transform: scale(1.06); }
     }
 
-    /* Controls & info */
+    .galaxy-label {
+      position: absolute;
+      top: 14%;
+      right: 20%;
+      font-size: 0.75rem;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(15,23,42,0.9);
+      border: 1px solid rgba(148,163,184,0.8);
+      color: #e5e7eb;
+      box-shadow: 0 10px 20px rgba(15,23,42,0.9);
+    }
+
+    /* controls & info */
     .controls-card {
       display: flex;
       flex-direction: column;
@@ -1056,18 +1073,19 @@
             Zoomable Universe
           </h1>
           <p class="hero-subtitle">
-            From living cells to cities, planets, galaxies and beyond. Scroll or drag the slider
-            to travel through scales and feel how incredibly small (and yet meaningful) our place
-            in this vast universe really is.
+            Zoom and pan like a map. Start inside a living cell, pass through human streets,
+            glide by Earth and the planets, and end up among the spirals of a galaxy. Feel how
+            tiny — and how special — our little world really is.
           </p>
           <div class="hero-meta">
-            <span><span class="hero-meta-icon">🧬</span><span>Cells · tissue · human scale</span></span>
-            <span><span class="hero-meta-icon">🪐</span><span>Earth · planets · star orbits</span></span>
-            <span><span class="hero-meta-icon">🌌</span><span>Galaxy clusters · cosmic web</span></span>
+            <span><span class="hero-meta-icon">🧬</span><span>Cells & microscopic life</span></span>
+            <span><span class="hero-meta-icon">🧍</span><span>Human scale & cities</span></span>
+            <span><span class="hero-meta-icon">🪐</span><span>Planets & orbits</span></span>
+            <span><span class="hero-meta-icon">🌌</span><span>Galaxies & beyond</span></span>
           </div>
           <div class="hero-cta">
             <button class="btn btn-primary" id="jump-human">
-              Take me to human scale
+              Go to human scale
             </button>
             <button class="btn btn-ghost" id="jump-cosmos">
               Jump to galaxies
@@ -1076,12 +1094,11 @@
         </div>
         <div class="hero-aside">
           <div class="aside-card">
-            <h3>What am I looking at?</h3>
+            <h3>What am I seeing?</h3>
             <p>
-              This is a <strong>visual toy</strong>, not a physics engine. Distances, sizes and
-              orbits are stylized — the goal is to build an intuition: from the scale of a single
-              <em>cell</em> all the way to swirling <em>galaxies</em>, our world sits on a tiny ledge
-              in a gigantic canvas.
+              A single continuous scene where everything is layered together. Instead of
+              hard-cut scenes, you <strong>physically zoom</strong> in and out, like a
+              cosmic version of a map.
             </p>
             <div class="legend-row">
               <span class="legend-pill">
@@ -1091,7 +1108,7 @@
                 <span class="legend-dot human"></span><span>Human</span>
               </span>
               <span class="legend-pill">
-                <span class="legend-dot earth"></span><span>Planets</span>
+                <span class="legend-dot earth"></span><span>Solar</span>
               </span>
               <span class="legend-pill">
                 <span class="legend-dot galaxy"></span><span>Galaxy</span>
@@ -1107,146 +1124,140 @@
         <section class="card">
           <div class="card-header">
             <h2 class="card-title">
-              <span>Interactive scale window</span>
-              <span class="card-badge">Scroll / drag to zoom</span>
+              <span>Interactive universe map</span>
+              <span class="card-badge">Scroll to zoom · drag to pan</span>
             </h2>
           </div>
           <div class="card-body">
             <p>
-              Use your mouse wheel, trackpad or the slider on the right to zoom smoothly between
-              four main regions: microscopic life, human scale, planetary orbits and galactic
-              structure.
+              Think of this like a tiny Google Maps for scale: you can zoom smoothly between
+              micro, human, planetary and galactic views. No jumps — just a continuous flight.
             </p>
             <p class="scale-note">
-              <strong>Note:</strong> nothing here is perfectly to scale. It’s an
-              <em>imagination aid</em>, designed to be visually pleasant and emotionally honest.
+              <strong>Note:</strong> Sizes and distances are not physically accurate.
+              This is a visual tool to support intuition and a feeling of scale, not a
+              scientific simulator.
             </p>
+
             <div class="cosmos-wrapper" id="cosmos-wrapper">
               <div class="cosmos-inner" id="cosmos-inner">
-                <!-- MICRO LAYER -->
-                <div class="cosmos-layer" data-layer="micro">
-                  <div class="micro-scene">
-                    <div class="micro-particles" id="micro-particles"></div>
-                    <div class="cell"></div>
-                    <div class="nucleus"></div>
-                    <div class="dna-helix">
-                      <div class="dna-strand"></div>
-                      <div class="dna-strand"></div>
-                    </div>
-                    <div class="dna-rungs">
-                      <!-- created in JS or static: we can make a few -->
-                      <div class="dna-rung"></div>
-                      <div class="dna-rung"></div>
-                      <div class="dna-rung"></div>
-                      <div class="dna-rung"></div>
-                      <div class="dna-rung"></div>
-                      <div class="dna-rung"></div>
-                      <div class="dna-rung"></div>
-                      <div class="dna-rung"></div>
+                <div class="cosmos-world" id="cosmos-world">
+                  <!-- GALAXY / UNIVERSE BACKGROUND -->
+                  <div class="cosmos-layer" data-layer="galaxy">
+                    <div class="galaxy-scene">
+                      <div class="universe-stars"></div>
+                      <div class="galaxy-stars"></div>
+                      <div class="galaxy-core"></div>
+                      <div class="galaxy-arm"></div>
+                      <div class="galaxy-arm alt"></div>
+                      <div class="galaxy-label">Milky Way · Samanyolu</div>
                     </div>
                   </div>
-                </div>
 
-                <!-- HUMAN / CITY LAYER -->
-                <div class="cosmos-layer" data-layer="human">
-                  <div class="human-scene">
-                    <div class="city-stars" id="city-stars"></div>
-                    <div class="you-label">You are here · Buradasın</div>
-                    <div class="ground"></div>
-                    <div class="human-figure">
-                      <div class="human-head"></div>
-                      <div class="human-body"></div>
-                      <div class="human-leg left"></div>
-                      <div class="human-leg right"></div>
-                    </div>
-                    <div class="cityline">
-                      <div class="building">
-                        <div class="window-row">
-                          <div class="window"></div><div class="window"></div><div class="window"></div>
-                          <div class="window"></div><div class="window"></div>
-                        </div>
+                  <!-- SOLAR SYSTEM LAYER -->
+                  <div class="cosmos-layer" data-layer="solar">
+                    <div class="solar-scene">
+                      <div class="solar-stars" id="solar-stars"></div>
+                      <div class="sun"></div>
+
+                      <!-- Orbits + planets -->
+                      <div class="orbit-ring" style="width:170px;height:170px;"></div>
+                      <div class="orbit" style="animation-duration: 16s;">
+                        <div class="planet mercury" style="transform: translate(45px, -45px);"></div>
                       </div>
-                      <div class="building">
-                        <div class="window-row">
-                          <div class="window"></div><div class="window"></div>
-                          <div class="window"></div><div class="window"></div>
-                          <div class="window"></div>
-                        </div>
+
+                      <div class="orbit-ring" style="width:260px;height:260px;"></div>
+                      <div class="orbit" style="animation-duration: 26s;">
+                        <div class="planet earth" style="transform: translate(80px, -80px);"></div>
                       </div>
-                      <div class="building">
-                        <div class="window-row">
-                          <div class="window"></div><div class="window"></div>
-                          <div class="window"></div><div class="window"></div>
-                          <div class="window"></div>
-                        </div>
+
+                      <div class="orbit-ring" style="width:320px;height:320px;"></div>
+                      <div class="orbit" style="animation-duration: 33s;">
+                        <div class="planet mars" style="transform: translate(105px, -105px);"></div>
                       </div>
-                      <div class="building">
-                        <div class="window-row">
-                          <div class="window"></div><div class="window"></div>
-                          <div class="window"></div>
-                        </div>
+
+                      <div class="orbit-ring" style="width:380px;height:380px;"></div>
+                      <div class="orbit" style="animation-duration: 45s;">
+                        <div class="planet jupiter" style="transform: translate(130px, -130px);"></div>
                       </div>
-                      <div class="building">
-                        <div class="window-row">
-                          <div class="window"></div><div class="window"></div>
-                          <div class="window"></div><div class="window"></div>
+
+                      <div class="orbit-ring" style="width:430px;height:430px;"></div>
+                      <div class="orbit" style="animation-duration: 60s;">
+                        <div class="planet saturn" style="transform: translate(155px, -155px);">
+                          <div class="ring"></div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- SOLAR SYSTEM LAYER -->
-                <div class="cosmos-layer" data-layer="solar">
-                  <div class="solar-scene">
-                    <div class="solar-stars" id="solar-stars"></div>
-                    <div class="sun"></div>
-
-                    <!-- Orbits + planets -->
-                    <!-- Mercury -->
-                    <div class="orbit-ring" style="width:130px;height:130px;"></div>
-                    <div class="orbit" style="animation-duration: 16s;">
-                      <div class="planet mercury" style="transform: translateX(65px) translate(-50%, -50%);"></div>
-                    </div>
-
-                    <!-- Earth -->
-                    <div class="orbit-ring" style="width:210px;height:210px;"></div>
-                    <div class="orbit" style="animation-duration: 26s;">
-                      <div class="planet earth" style="transform: translateX(105px) translate(-50%, -50%);"></div>
-                    </div>
-
-                    <!-- Mars -->
-                    <div class="orbit-ring" style="width:260px;height:260px;"></div>
-                    <div class="orbit" style="animation-duration: 33s;">
-                      <div class="planet mars" style="transform: translateX(130px) translate(-50%, -50%);"></div>
-                    </div>
-
-                    <!-- Jupiter -->
-                    <div class="orbit-ring" style="width:320px;height:320px;"></div>
-                    <div class="orbit" style="animation-duration: 45s;">
-                      <div class="planet jupiter" style="transform: translateX(160px) translate(-50%, -50%);"></div>
-                    </div>
-
-                    <!-- Saturn -->
-                    <div class="orbit-ring" style="width:380px;height:380px;"></div>
-                    <div class="orbit" style="animation-duration: 60s;">
-                      <div class="planet saturn" style="transform: translateX(190px) translate(-50%, -50%);">
-                        <div class="ring"></div>
+                  <!-- HUMAN / CITY LAYER -->
+                  <div class="cosmos-layer" data-layer="human">
+                    <div class="human-scene">
+                      <div class="city-stars" id="city-stars"></div>
+                      <div class="you-label">You are here · Buradasın</div>
+                      <div class="ground"></div>
+                      <div class="human-figure">
+                        <div class="human-head"></div>
+                        <div class="human-body"></div>
+                        <div class="human-leg left"></div>
+                        <div class="human-leg right"></div>
+                      </div>
+                      <div class="cityline">
+                        <div class="building">
+                          <div class="window-row">
+                            <div class="window"></div><div class="window"></div><div class="window"></div>
+                            <div class="window"></div><div class="window"></div>
+                          </div>
+                        </div>
+                        <div class="building">
+                          <div class="window-row">
+                            <div class="window"></div><div class="window"></div>
+                            <div class="window"></div><div class="window"></div>
+                            <div class="window"></div>
+                          </div>
+                        </div>
+                        <div class="building">
+                          <div class="window-row">
+                            <div class="window"></div><div class="window"></div>
+                            <div class="window"></div><div class="window"></div>
+                            <div class="window"></div>
+                          </div>
+                        </div>
+                        <div class="building">
+                          <div class="window-row">
+                            <div class="window"></div><div class="window"></div>
+                            <div class="window"></div>
+                          </div>
+                        </div>
+                        <div class="building">
+                          <div class="window-row">
+                            <div class="window"></div><div class="window"></div>
+                            <div class="window"></div><div class="window"></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
 
-                <!-- GALAXY / UNIVERSE LAYER -->
-                <div class="cosmos-layer" data-layer="galaxy">
-                  <div class="galaxy-scene">
-                    <div class="universe-stars"></div>
-                    <div class="galaxy-stars"></div>
-                    <div class="galaxy-core"></div>
-                    <div class="galaxy-arm"></div>
-                    <div class="galaxy-arm alt"></div>
+                  <!-- MICRO LAYER -->
+                  <div class="cosmos-layer" data-layer="micro">
+                    <div class="micro-scene">
+                      <div class="micro-particles" id="micro-particles"></div>
+                      <div class="cell"></div>
+                      <div class="nucleus"></div>
+                      <div class="dna-helix">
+                        <div class="dna-strand"></div>
+                        <div class="dna-strand"></div>
+                      </div>
+                      <div class="dna-rungs">
+                        <div class="dna-rung"></div><div class="dna-rung"></div><div class="dna-rung"></div>
+                        <div class="dna-rung"></div><div class="dna-rung"></div><div class="dna-rung"></div>
+                        <div class="dna-rung"></div><div class="dna-rung"></div>
+                      </div>
+                      <div class="micro-label">Inside your body · Hücrenin içi</div>
+                    </div>
                   </div>
-                </div>
+                </div> <!-- cosmos-world -->
               </div>
             </div>
           </div>
@@ -1255,17 +1266,17 @@
         <section class="card controls-card">
           <div class="card-header">
             <h2 class="card-title">
-              <span>Scale & details</span>
-              <span class="card-badge">From 10⁻⁶ m to 10²⁴ m</span>
+              <span>Scale & context</span>
+              <span class="card-badge">From 10⁻⁶ m to ~10²⁴ m</span>
             </h2>
           </div>
           <div class="card-body">
             <div class="slider-row">
               <div class="slider-label-row">
                 <span><strong>Scale</strong> (approximate)</span>
-                <span id="scale-value-label">Micro · Cell scale</span>
+                <span id="scale-value-label">Human · City scale</span>
               </div>
-              <input type="range" id="scale-range" min="0" max="100" value="35" />
+              <input type="range" id="scale-range" min="0" max="100" value="40" />
               <div class="scale-markers">
                 <span>Cell</span>
                 <span>Human</span>
@@ -1284,20 +1295,23 @@
                   <small id="scale-meter">~ 1–10 m</small>
                 </div>
                 <div class="scale-chip">
-                  <span>Perspective:</span><small id="scale-perspective">You are walking on the surface of a huge sphere.</small>
+                  <span>Perspective:</span>
+                  <small id="scale-perspective">
+                    You walk on a giant sphere, under a thin envelope of air.
+                  </small>
                 </div>
               </div>
               <p class="scale-info-text" id="scale-description">
-                The scale of bodies, rooms, buildings and streets. At this level we tend to feel
-                like “normal size” — but compared to planets and galaxies, even a city is a dust
-                speck.
+                The scale of bodies, rooms, buildings and streets. At this level we feel “normal
+                sized”, even though our whole city is smaller than a dust mote compared to a
+                planet.
               </p>
             </div>
 
             <div class="hint-row">
-              <strong>Controls:</strong> Scroll over the main window to zoom · Drag the slider · Try
-              jumping between human and galaxy scales. <br />
-              <span style="opacity:0.9;">(Bu sadece görsel ve eğitici bir araçtır, tam fiziksel ölçek doğru değildir.)</span>
+              <strong>Controls:</strong> Scroll over the universe window to zoom · drag to pan · use
+              the slider or the quick buttons above to jump between human and galaxy scales. <br />
+              <span style="opacity:0.9;">(Bu görsel ve eğitici bir araçtır; fiziksel ölçekler yaklaşık olarak düşünülmelidir.)</span>
             </div>
           </div>
         </section>
@@ -1305,13 +1319,12 @@
     </main>
 
     <footer>
-      Built as a static HTML experiment to feel cosmic scale a bit more deeply.  
+      A static HTML experiment for feeling cosmic scale.  
       No tracking, no data collection — just you, a browser and a very big universe.
     </footer>
   </div>
 
   <script>
-    // --- State & constants ---
     const scaleRange = document.getElementById("scale-range");
     const scaleValueLabel = document.getElementById("scale-value-label");
     const scaleTitleEl = document.getElementById("scale-title");
@@ -1319,14 +1332,24 @@
     const scalePerspectiveEl = document.getElementById("scale-perspective");
     const scaleDescEl = document.getElementById("scale-description");
     const scaleDotEl = document.getElementById("scale-dot");
-    const cosmosInner = document.getElementById("cosmos-inner");
-    const cosmosWrapper = document.getElementById("cosmos-wrapper");
-    const layers = Array.from(document.querySelectorAll(".cosmos-layer"));
 
-    // For extra dots/stars we fill dynamically
+    const cosmosWrapper = document.getElementById("cosmos-wrapper");
+    const cosmosWorld = document.getElementById("cosmos-world");
+
     const microParticles = document.getElementById("micro-particles");
     const cityStars = document.getElementById("city-stars");
     const solarStars = document.getElementById("solar-stars");
+
+    const layers = Array.from(document.querySelectorAll(".cosmos-layer"));
+
+    // zoom state
+    let zoom = 1.8;
+    let panX = 0;
+    let panY = 0;
+
+    let isDragging = false;
+    let lastX = 0;
+    let lastY = 0;
 
     const scaleConfig = [
       {
@@ -1338,29 +1361,29 @@
         perspective:
           "Cell membranes, organelles and DNA spirals – a universe inside every living being.",
         description:
-          "At this scale, life is made of tiny structures, constantly in motion. A single cell is a world of its own, full of instructions and activity that you never see with bare eyes.",
+          "At this scale, life is made of tiny structures that never stop moving. A single cell is a world of its own, packed with information and activity you never see directly.",
       },
       {
         key: "human",
-        center: 35,
+        center: 40,
         dotColor: "#fbbf24",
         label: "Human · City & life size",
         meter: "~ 1 – 10² m",
         perspective:
           "Rooms, people, houses and skyscrapers – the scale we emotionally call ‘normal’.",
         description:
-          "Here we walk, work, love, get tired and dream. It feels like everything important happens at this size, yet even our largest cities are microscopic compared to planets.",
+          "Here you walk, breathe, work and rest. Your body, your room, your street: this feels like the whole stage – but compared to planets, even a megacity is microscopic.",
       },
       {
         key: "solar",
-        center: 65,
+        center: 70,
         dotColor: "#38bdf8",
         label: "Planetary · Earth & Sun",
         meter: "~ 10⁶ – 10¹² m",
         perspective:
-          "Earth, Moon, planets and the star that keeps us warm – the Solar System neighbourhood.",
+          "Earth, Moon, planets and the star that keeps us warm – our Solar neighbourhood.",
         description:
-          "Now Earth becomes a small marble orbiting a star. Distances between planets are huge; months or years of travel. Our whole world is just one orbit in a quiet corner of a galaxy.",
+          "Earth becomes a tiny marble orbiting the Sun, with vast empty distances between planets. Years of travel separate worlds. Our entire history unfolds on a thin film on one small rock.",
       },
       {
         key: "galaxy",
@@ -1369,13 +1392,91 @@
         label: "Galactic & beyond",
         meter: "~ 10¹⁸ – 10²⁴ m",
         perspective:
-          "Billions of stars swirling together; clusters of galaxies linked in a cosmic web.",
+          "Hundreds of billions of stars swirling together; many galaxies linked in a cosmic web.",
         description:
-          "Our Sun is one among hundreds of billions in the Milky Way. And the Milky Way is just one galaxy among perhaps trillions. On this canvas, our entire Solar System is almost invisible.",
+          "Our Sun is one among countless stars in the Milky Way. And the Milky Way is only one galaxy among perhaps trillions. On this canvas, even the Solar System almost disappears.",
       },
     ];
 
-    // --- Init random particles / stars for extra life ---
+    function clamp(num, min, max) {
+      return Math.min(Math.max(num, min), max);
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function zoomFromSlider(v) {
+      const t = v / 100; // 0..1
+      const minZoom = 0.5;
+      const maxZoom = 5.0;
+      return minZoom * Math.pow(maxZoom / minZoom, t); // exponential feel
+    }
+
+    function updateCosmosTransform() {
+      cosmosWorld.style.transform =
+        `translate(-50%, -50%) translate(${panX}px, ${panY}px) scale(${zoom})`;
+    }
+
+    function updateLayerOpacities(v) {
+      layers.forEach((layer) => {
+        const key = layer.dataset.layer;
+        const cfg = scaleConfig.find((c) => c.key === key);
+        if (!cfg) return;
+        const dist = Math.abs(v - cfg.center);
+        const band = 30;
+        let visibility = 1 - dist / band;
+        visibility = clamp(visibility, 0, 1);
+        layer.style.opacity = (visibility ** 1.3).toFixed(3);
+      });
+    }
+
+    function updateScaleUi(v) {
+      let best = scaleConfig[0];
+      let bestDist = 999;
+      for (const cfg of scaleConfig) {
+        const d = Math.abs(v - cfg.center);
+        if (d < bestDist) {
+          best = cfg;
+          bestDist = d;
+        }
+      }
+
+      scaleValueLabel.textContent = best.label;
+      scaleTitleEl.textContent = best.label;
+      scaleMeterEl.textContent = best.meter;
+      scalePerspectiveEl.textContent = best.perspective;
+      scaleDescEl.textContent = best.description;
+      scaleDotEl.style.background = best.dotColor;
+      scaleDotEl.style.boxShadow = `0 0 12px ${best.dotColor}`;
+    }
+
+    function updateScale(v) {
+      const value = clamp(v, 0, 100);
+      const newZoom = zoomFromSlider(value);
+      zoom = newZoom;
+      updateCosmosTransform();
+      updateLayerOpacities(value);
+      updateScaleUi(value);
+    }
+
+    function animateSliderTo(targetValue) {
+      const start = Number(scaleRange.value);
+      const duration = 450;
+      const startTime = performance.now();
+
+      function frame(now) {
+        const t = clamp((now - startTime) / duration, 0, 1);
+        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        const value = lerp(start, targetValue, eased);
+        scaleRange.value = String(value.toFixed(0));
+        updateScale(value);
+        if (t < 1) requestAnimationFrame(frame);
+      }
+
+      requestAnimationFrame(frame);
+    }
+
     function createRandomDots(container, count, sizeMin, sizeMax, className) {
       if (!container) return;
       const rect = container.getBoundingClientRect();
@@ -1401,7 +1502,6 @@
       createRandomDots(cityStars, 22, 2, 3, "city-star");
       createRandomDots(solarStars, 26, 2, 3, "solar-star");
 
-      // initial scale
       updateScale(Number(scaleRange.value));
 
       scaleRange.addEventListener("input", (e) => {
@@ -1423,76 +1523,67 @@
         { passive: false }
       );
 
+      cosmosWrapper.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        cosmosWrapper.classList.add("dragging");
+        lastX = e.clientX;
+        lastY = e.clientY;
+      });
+
+      window.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - lastX;
+        const dy = e.clientY - lastY;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        panX += dx;
+        panY += dy;
+        updateCosmosTransform();
+      });
+
+      window.addEventListener("mouseup", () => {
+        isDragging = false;
+        cosmosWrapper.classList.remove("dragging");
+      });
+
+      cosmosWrapper.addEventListener("mouseleave", () => {
+        isDragging = false;
+        cosmosWrapper.classList.remove("dragging");
+      });
+
+      // touch support (basic)
+      cosmosWrapper.addEventListener("touchstart", (e) => {
+        if (e.touches.length === 1) {
+          const t = e.touches[0];
+          isDragging = true;
+          lastX = t.clientX;
+          lastY = t.clientY;
+        }
+      });
+
+      cosmosWrapper.addEventListener("touchmove", (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        const t = e.touches[0];
+        const dx = t.clientX - lastX;
+        const dy = t.clientY - lastY;
+        lastX = t.clientX;
+        lastY = t.clientY;
+        panX += dx;
+        panY += dy;
+        updateCosmosTransform();
+      });
+
+      cosmosWrapper.addEventListener("touchend", () => {
+        isDragging = false;
+      });
+
       document.getElementById("jump-human").addEventListener("click", () => {
-        animateSliderTo(35);
+        animateSliderTo(40);
       });
       document.getElementById("jump-cosmos").addEventListener("click", () => {
         animateSliderTo(90);
       });
     });
-
-    function clamp(num, min, max) {
-      return Math.min(Math.max(num, min), max);
-    }
-
-    function lerp(a, b, t) {
-      return a + (b - a) * t;
-    }
-
-    function updateScale(value) {
-      const v = clamp(value, 0, 100);
-
-      // update layers visibility & scale
-      layers.forEach((layer) => {
-        const key = layer.dataset.layer;
-        const cfg = scaleConfig.find((c) => c.key === key);
-        if (!cfg) return;
-        const dist = Math.abs(v - cfg.center);
-        const band = 28; // width of blending region
-        let visibility = 1 - dist / band;
-        visibility = clamp(visibility, 0, 1);
-
-        const scaleFactor = lerp(0.7, 1.05, visibility);
-        layer.style.opacity = (visibility ** 1.3).toFixed(3);
-        layer.style.transform = `scale(${scaleFactor})`;
-      });
-
-      // pick nearest scale config for text
-      let best = scaleConfig[0];
-      let bestDist = 999;
-      for (const cfg of scaleConfig) {
-        const d = Math.abs(v - cfg.center);
-        if (d < bestDist) {
-          bestDist = d;
-          best = cfg;
-        }
-      }
-
-      scaleValueLabel.textContent = best.label;
-      scaleTitleEl.textContent = best.label;
-      scaleMeterEl.textContent = best.meter;
-      scalePerspectiveEl.textContent = best.perspective;
-      scaleDescEl.textContent = best.description;
-      scaleDotEl.style.background = best.dotColor;
-      scaleDotEl.style.boxShadow = `0 0 12px ${best.dotColor}`;
-    }
-
-    function animateSliderTo(target) {
-      const start = Number(scaleRange.value);
-      const duration = 450;
-      const startTime = performance.now();
-
-      function frame(now) {
-        const t = clamp((now - startTime) / duration, 0, 1);
-        const eased = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
-        const value = lerp(start, target, eased);
-        scaleRange.value = String(value.toFixed(0));
-        updateScale(value);
-        if (t < 1) requestAnimationFrame(frame);
-      }
-
-      requestAnimationFrame(frame);
-    }
   </script>
 </body>
 </html>
